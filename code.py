@@ -1,48 +1,32 @@
 import streamlit as st
 import random
 
-st.title("🎲 Random Name Picker (No Repeats!)")
+st.title("🎤 Random Presenter Picker (No Repeats)")
+
+# Fixed list of names
+names = ["Ali M", "Ali S", "Samer", "Aazim", "Sidra"]
 
 # Initialize session state
-if "names" not in st.session_state:
-    st.session_state.names = []
-if "last_name" not in st.session_state:
-    st.session_state.last_name = None
 if "history" not in st.session_state:
     st.session_state.history = []
 
-# Input names
-name_input = st.text_area("Enter names (one per line)", height=150)
-if st.button("Save Names"):
-    names = [name.strip() for name in name_input.split("\n") if name.strip()]
-    if len(names) < 2:
-        st.error("Please enter at least two names.")
+# Select the last presenter
+last_presenter = st.selectbox("👤 Who presented last?", ["None"] + names)
+last_presenter = None if last_presenter == "None" else last_presenter
+
+# Button to pick the next presenter
+if st.button("🎲 Pick Next Presenter"):
+    possible_choices = [name for name in names if name != last_presenter]
+
+    if not possible_choices:
+        st.warning("Only one name available. Everyone has already presented.")
     else:
-        st.session_state.names = names
-        st.session_state.last_name = None
-        st.session_state.history = []
-        st.success("Names saved!")
-
-# Display saved names
-if st.session_state.names:
-    st.subheader("📋 Saved Names")
-    st.write(", ".join(st.session_state.names))
-
-    # Pick random name
-    if st.button("🎤 Pick Presenter"):
-        possible_choices = [
-            name for name in st.session_state.names
-            if name != st.session_state.last_name
-        ]
-        if not possible_choices:
-            st.warning("Only one name available or no alternatives. Resetting history.")
-            possible_choices = st.session_state.names
         chosen = random.choice(possible_choices)
-        st.session_state.last_name = chosen
-        st.session_state.history.append(chosen)
         st.success(f"🎉 Selected: **{chosen}**")
+        st.session_state.history.append((last_presenter, chosen))
 
-    # Show history
-    if st.session_state.history:
-        st.subheader("🕓 History")
-        st.write(" → ".join(st.session_state.history))
+# Show history
+if st.session_state.history:
+    st.subheader("🕓 History")
+    for i, (last, current) in enumerate(st.session_state.history, 1):
+        st.write(f"{i}. Last: {last or 'None'} → Now: {current}")
