@@ -37,7 +37,7 @@ if st.button("🎲 Pick Next Presenter"):
         # Show image
         image_path = people.get(chosen)
         if image_path and os.path.exists(image_path):
-            st.image(image_path, caption=chosen, use_column_width=True)
+            st.image(image_path, caption=chosen, use_container_width=True)
         else:
             st.info("📷 No image available for this person.")
 
